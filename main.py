@@ -1,13 +1,20 @@
 from flask import Flask, jsonify, request, render_template
 import sqlite3
 import os
-app = Flask(__name__)
-DATABASE = 'shop.db'
 import secrets
 from dotenv import load_dotenv
+
+load_dotenv()
+app = Flask(__name__)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+
+DATABASE = 'shop.db'
+
 @app.route('/')
 def index():
+    print("Request to index() route received!")  # Добавлено логирование
     return render_template('index.html')
+
 # -------------------  Database Functions -------------------
 
 def get_db_connection():
@@ -75,10 +82,7 @@ def create_order():
 
     return jsonify({'message': 'Order created successfully'}), 201
 
-if __name__ == '__main__':
-    #init_db()  # uncomment to init the database on first run.
-    app.run(debug=True)
-#secret_key = secrets.token_hex(32)  # 32 байта = 64 символа (рекомендуемая длина)
-#print(f"Сгенерированный секретный ключ: {secret_key}")
-load_dotenv()
-app.secret_key = os.environ.get('FLASK_SECRET_KEY')
+# Не запускаем приложение напрямую через app.run, когда используем Gunicorn
+# if __name__ == '__main__':
+#     #init_db()  # uncomment to init the database on first run.
+#     app.run(debug=True, host='0.0.0.0', port=8000)
